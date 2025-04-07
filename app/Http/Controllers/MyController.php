@@ -24,9 +24,6 @@ class MyController extends Controller
         echo "Task added successfully";
         return view('/home');
     }
-
-   
-
     public function register(Request $request){
         $name1 = $request->input('name');
         $email1 = $request->input('email');
@@ -117,4 +114,27 @@ class MyController extends Controller
     }
     
     
+    public function addfile(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:jpg,png,jpeg',
+        ]);
+    
+        $id = $request->session()->get('id');
+        $file = $request->file('file');
+    
+        $path = $file->store('uploads', 'public');
+           $url = Storage::url($path); 
+        $f = new Files();
+        $f->user_id = $id;
+        $f->filename = $url;
+        $f->save();
+    
+        echo "File uploaded successfully!";
+    
+        $files = Files::where('user_id', $id)->get();
+        return view('home', ['files' => $files]);
+    }
+}
+
 }
